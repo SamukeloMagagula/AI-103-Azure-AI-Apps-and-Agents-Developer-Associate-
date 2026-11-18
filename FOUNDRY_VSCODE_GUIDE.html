@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Microsoft Foundry for VS Code — AI-103 Companion</title>
+<meta name="description" content="Exam-focused walkthrough of the Microsoft Foundry extension for VS Code, aligned to every AI-103 skill area." />
+<style>
+  :root {
+    --bg:           #f6f7fb;
+    --surface:      #ffffff;
+    --surface-alt:  #eef1f8;
+    --border:       #d8dee9;
+    --text:         #1b1f27;
+    --muted:        #576072;
+    --accent:       #0a84ff;
+    --accent-weak:  #e8f1ff;
+    --success:      #1a7f37;
+    --warn:         #b26a00;
+    --danger:       #c7301b;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+    --vsc-bg:       #1e1e1e;
+    --vsc-panel:    #252526;
+    --vsc-side:     #333333;
+    --vsc-border:   #3c3c3c;
+    --vsc-text:     #cccccc;
+    --vsc-muted:    #858585;
+    --vsc-accent:   #0e639c;
+    --vsc-chip:     #37373d;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:          #0f1115;
+      --surface:     #171922;
+      --surface-alt: #1f2230;
+      --border:      #2a2f3d;
+      --text:        #e6e8ee;
+      --muted:       #9099ad;
+      --accent:      #4ea3ff;
+      --accent-weak: #16263d;
+      --success:     #4ac26b;
+      --warn:        #e2a44a;
+      --danger:      #ff6b6b;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:          #0f1115;
+    --surface:     #171922;
+    --surface-alt: #1f2230;
+    --border:      #2a2f3d;
+    --text:        #e6e8ee;
+    --muted:       #9099ad;
+    --accent:      #4ea3ff;
+    --accent-weak: #16263d;
+    --success:     #4ac26b;
+    --warn:        #e2a44a;
+    --danger:      #ff6b6b;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 48px 16px 96px; }
+
+  header.hero {
+    background: linear-gradient(135deg, var(--accent-weak) 0%, transparent 70%);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 32px 28px; margin-bottom: 32px;
+  }
+  .eyebrow { text-transform: uppercase; letter-spacing: 1.5px; font-size: 12px; color: var(--accent); font-weight: 600; margin: 0 0 8px; }
+  h1 { margin: 0 0 8px; font-size: 32px; line-height: 1.2; letter-spacing: -0.4px; }
+  h3 { margin: 24px 0 8px; font-size: 16px; color: var(--text); letter-spacing: -0.2px; }
+  .sub { color: var(--muted); font-size: 16px; margin: 0; max-width: 62ch; }
+
+  .weight-table { width: 100%; border-collapse: collapse; margin: 20px 0 0; }
+  .weight-table th, .weight-table td {
+    text-align: left; padding: 10px 14px; font-size: 13.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .weight-table th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+  .weight-table tr.biggest td { background: var(--accent-weak); font-weight: 600; }
+  .weight-table td a { color: var(--accent); text-decoration: none; }
+  .weight-table td a:hover { text-decoration: underline; }
+
+  nav.toc {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 8px 16px; margin: 20px 0 0; padding: 16px 20px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  }
+  nav.toc a { color: var(--text); text-decoration: none; font-size: 14px; padding: 4px 0; border-bottom: 1px solid transparent; }
+  nav.toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  nav.toc .num { display: inline-block; width: 22px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  section.step {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 28px; margin: 24px 0;
+  }
+  .step h2 { display: flex; align-items: center; gap: 12px; margin: 0 0 6px; font-size: 22px; letter-spacing: -0.2px; }
+  .step .chip { background: var(--accent); color: white; font-size: 13px; font-weight: 600; padding: 2px 10px; border-radius: 999px; }
+  .step .objective {
+    display: inline-block; font-size: 12px; color: var(--muted);
+    background: var(--surface-alt); border: 1px solid var(--border);
+    padding: 3px 10px; border-radius: 999px; margin-bottom: 14px;
+  }
+  .step .objective strong { color: var(--text); }
+  .step p { margin: 8px 0 14px; }
+  .step ol, .step ul { margin: 8px 0 14px; padding-left: 22px; }
+  .step li { margin: 4px 0; }
+
+  .illustration {
+    display: block; width: 100%;
+    background: var(--surface-alt); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px; margin: 16px 0;
+  }
+  .illustration svg { display: block; width: 100%; height: auto; max-height: 440px; }
+  figcaption { color: var(--muted); font-size: 13px; margin-top: 6px; text-align: center; font-style: italic; }
+
+  code, kbd {
+    font-family: var(--mono); font-size: 13.5px;
+    background: var(--surface-alt); color: var(--text);
+    padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--surface-alt); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px; overflow: auto;
+    font-family: var(--mono); font-size: 13px; margin: 12px 0; line-height: 1.5;
+  }
+
+  table.ref { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13.5px; }
+  table.ref th, table.ref td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.ref th { background: var(--surface-alt); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+  table.ref td code { font-size: 12.5px; }
+
+  .callout {
+    display: grid; grid-template-columns: 28px 1fr; gap: 12px;
+    padding: 14px 16px; border-radius: 8px; margin: 14px 0; font-size: 14.5px;
+  }
+  .callout.tip   { background: color-mix(in srgb, var(--success) 14%, transparent); border: 1px solid color-mix(in srgb, var(--success) 40%, transparent); }
+  .callout.warn  { background: color-mix(in srgb, var(--warn)    16%, transparent); border: 1px solid color-mix(in srgb, var(--warn)    45%, transparent); }
+  .callout.info  { background: var(--accent-weak); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); }
+  .callout.exam  { background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); }
+  .callout .icon { font-weight: 700; text-align: center; font-size: 16px; }
+
+  .exam-head { color: var(--accent); font-weight: 700; display: block; margin-bottom: 4px; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .kbd-row kbd {
+    background: var(--surface); border: 1px solid var(--border); border-bottom-width: 2px;
+    border-radius: 5px; padding: 2px 7px; font-size: 12.5px; margin: 0 2px;
+  }
+
+  details { margin: 12px 0; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-alt); }
+  details[open] { background: var(--surface); }
+  details summary { cursor: pointer; padding: 10px 14px; font-weight: 600; font-size: 14px; }
+  details .body { padding: 0 16px 14px; }
+
+  footer { margin-top: 40px; text-align: center; color: var(--muted); font-size: 13px; }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  .toggle {
+    position: fixed; top: 16px; right: 16px;
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px;
+    font-size: 13px; cursor: pointer; font-family: var(--sans);
+  }
+  .toggle:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<button class="toggle" id="themeToggle" aria-label="Toggle theme">Toggle theme</button>
+
+<div class="wrap">
+
+  <header class="hero">
+    <p class="eyebrow">AI-103 companion guide · Microsoft Foundry for VS Code</p>
+    <h1>Foundry Toolkit for VS Code — Exam-Focused Walkthrough</h1>
+    <p class="sub">Every step below maps to a published AI-103 skill. Treat the toolkit as a learning aid and exam rehearsal — the exam asks "which deployment SKU, which tool type, which role," not "where do I click." This guide pins down both.</p>
+
+    <table class="weight-table">
+      <thead><tr><th>Skill area</th><th>Weight</th><th>Covered in</th></tr></thead>
+      <tbody>
+        <tr><td>Plan and manage an Azure AI solution</td><td>25-30%</td><td><a href="#s1">1-3</a>, <a href="#s10">10</a></td></tr>
+        <tr class="biggest"><td>Implement generative AI and agentic solutions</td><td><strong>30-35%</strong></td><td><a href="#s4">4-7</a></td></tr>
+        <tr><td>Implement computer vision solutions</td><td>10-15%</td><td><a href="#s8">8</a></td></tr>
+        <tr><td>Implement text analysis solutions</td><td>10-15%</td><td><a href="#s9">9</a></td></tr>
+        <tr><td>Implement information extraction solutions</td><td>10-15%</td><td><a href="#s7">7</a>, <a href="#s8">8</a></td></tr>
+      </tbody>
+    </table>
+
+    <nav class="toc" aria-label="Table of contents">
+      <a href="#s1"><span class="num">1.</span>Install &amp; sign in</a>
+      <a href="#s2"><span class="num">2.</span>Subscriptions &amp; providers</a>
+      <a href="#s3"><span class="num">3.</span>Model catalog &amp; deployments</a>
+      <a href="#s4"><span class="num">4.</span>Scaffold a Foundry project</a>
+      <a href="#s5"><span class="num">5.</span>Responses API playground</a>
+      <a href="#s6"><span class="num">6.</span>Agent Framework</a>
+      <a href="#s7"><span class="num">7.</span>Tools, RAG &amp; grounding</a>
+      <a href="#s8"><span class="num">8.</span>Vision &amp; Content Understanding</a>
+      <a href="#s9"><span class="num">9.</span>Text analysis &amp; Speech</a>
+      <a href="#s10"><span class="num">10.</span>Evaluation, safety, monitoring</a>
+      <a href="#cheat"><span class="num">11.</span>Exam cheat sheet</a>
+      <a href="#trouble"><span class="num">12.</span>Troubleshooting</a>
+    </nav>
+
+    <div class="callout info" style="margin-top:16px;">
+      <span class="icon">i</span>
+      <span>Diagrams are inline <strong>SVG mockups</strong> that mirror the current Foundry VS Code UI — swap any <code>&lt;figure&gt;</code> for an <code>&lt;img&gt;</code> once you capture your own screenshots.</span>
+    </div>
+  </header>
+
+  <!-- ====================== STEP 1 ====================== -->
+  <section id="s1" class="step">
+    <h2><span class="chip">1</span>Install the extension &amp; sign in</h2>
+    <span class="objective"><strong>Objective →</strong> Plan and manage an Azure AI solution · Design Azure infrastructure for AI apps</span>
+
+    <h3>Install</h3>
+    <ol>
+      <li>Open VS Code → Extensions (<span class="kbd-row"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd></span>).</li>
+      <li>Search <code>Microsoft Foundry</code> (publisher <code>ms-azuretools</code>) → Install.</li>
+      <li>Install dependencies: <strong>Azure Resources</strong>, <strong>Python</strong>.</li>
+      <li>Reload the window so the Foundry Activity Bar icon appears.</li>
+    </ol>
+
+    <figure class="illustration" aria-label="Extensions marketplace mockup">
+      <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" role="img">
+        <title>Extensions pane with Microsoft Foundry selected</title>
+        <rect x="0" y="0" width="800" height="300" rx="8" fill="var(--vsc-bg)"/>
+        <rect x="0" y="0" width="60" height="300" fill="var(--vsc-side)"/>
+        <rect x="22" y="140" width="16" height="16" fill="var(--vsc-accent)"/>
+        <rect x="60" y="0" width="300" height="300" fill="var(--vsc-panel)"/>
+        <rect x="76" y="20" width="268" height="28" rx="4" fill="var(--vsc-bg)" stroke="var(--vsc-border)"/>
+        <text x="86" y="39" font-family="var(--sans)" font-size="13" fill="var(--vsc-text)">Microsoft Foundry</text>
+        <rect x="76" y="68" width="268" height="86" rx="6" fill="var(--vsc-bg)" stroke="var(--vsc-border)"/>
+        <rect x="88" y="80" width="40" height="40" rx="6" fill="var(--vsc-accent)"/>
+        <text x="90" y="105" font-family="var(--sans)" font-size="16" font-weight="700" fill="white">F</text>
+        <text x="140" y="92"  font-family="var(--sans)" font-size="13" font-weight="700" fill="var(--vsc-text)">Microsoft Foundry</text>
+        <text x="140" y="108" font-family="var(--sans)" font-size="11" fill="var(--vsc-muted)">Build AI apps and agents in VS Code</text>
+        <rect x="140" y="120" width="62" height="22" rx="4" fill="var(--vsc-accent)"/>
+        <text x="152" y="135" font-family="var(--sans)" font-size="11" fill="white">Install</text>
+        <text x="212" y="135" font-family="var(--sans)" font-size="11" fill="var(--vsc-muted)">v1.3.0 · 2M installs</text>
+        <rect x="360" y="0" width="440" height="300" fill="var(--vsc-bg)"/>
+        <rect x="360" y="0" width="440" height="30" fill="var(--vsc-panel)"/>
+        <text x="376" y="20" font-family="var(--sans)" font-size="12" fill="var(--vsc-text)">Welcome to Foundry</text>
+        <text x="380" y="80"  font-family="var(--sans)" font-size="16" fill="var(--vsc-text)" font-weight="700">Get started</text>
+        <text x="380" y="110" font-family="var(--sans)" font-size="12" fill="var(--vsc-muted)">Sign in · Browse models · Create project</text>
+        <rect x="380" y="130" width="140" height="28" rx="4" fill="var(--vsc-accent)"/>
+        <text x="408" y="148" font-family="var(--sans)" font-size="12" fill="white">Sign in to Azure</text>
+      </svg>
+      <figcaption>Figure 1 — Extensions pane with the Microsoft Foundry card.</figcaption>
+    </figure>
+
+    <h3>Sign in — use Device Code, not the browser flow</h3>
+    <p>The default browser redirect breaks silently when loopback is blocked (corporate firewalls, non-default browser profiles). Use Device Code from the start:</p>
+    <ol>
+      <li><span class="kbd-row"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></span> → <code>Azure: Sign In with Device Code</code>.</li>
+      <li>Copy the 9-character code from the notification.</li>
+      <li>Open <code>microsoft.com/devicelogin</code>, paste the code, authenticate.</li>
+      <li>Wait ~15 seconds. Status bar bottom-left should show your email.</li>
+    </ol>
+
+    <div class="callout exam">
+      <span class="icon">⬢</span>
+      <span><span class="exam-head">AI-103 fact</span>
+      For keyless auth, code uses <code>DefaultAzureCredential()</code>. Token scope for Azure OpenAI = <code>https://cognitiveservices.azure.com/.default</code>, for the Foundry project = <code>https://ai.azure.com/.default</code>. Required roles: <code>Cognitive Services OpenAI User</code>, <code>Azure AI Developer</code>, <code>Search Index Data Reader</code>.</span>
+    </div>
+  </section>
+
+  <!-- ====================== STEP 2 ====================== -->
+  <section id="s2" class="step">
+    <h2><span class="chip">2</span>Pick the tenant, subscription &amp; register providers</h2>
+    <span class="objective"><strong>Objective →</strong> Choose appropriate deployment options · Design Azure infrastructure</span>
+
+    <ol>
+      <li><span class="kbd-row"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></span> → <code>Azure: Select Tenant</code> (skip if only one).</li>
+      <li><code>Azure: Select Subscriptions</code> → tick the sub holding your resource group.</li>
+      <li>In the Azure portal: open the subscription → <strong>Resource providers</strong> → ensure these are <code>Registered</code>:
+        <ul>
+          <li><code>Microsoft.CognitiveServices</code> (Azure OpenAI + other AI services)</li>
+          <li><code>Microsoft.MachineLearningServices</code> (Foundry projects + agents)</li>
+          <li><code>Microsoft.Search</code> (AI Search)</li>
+          <li><code>Microsoft.Storage</code> (RAG ingestion)</li>
+        </ul>
+      </li>
+    </ol>
+
+    <div class="callout warn"><span class="icon">!</span><span>A new subscription will refuse <code>Microsoft.CognitiveServices</code> deployments with a 409 until you register the provider. The exam loves this trap.</span></div>
+  </section>
+
+  <!-- ====================== STEP 3 ====================== -->
+  <section id="s3" class="step">
+    <h2><span class="chip">3</span>Browse the model catalog &amp; deploy</h2>
+    <span class="objective"><strong>Objective →</strong> Choose an appropriate model for each task · Configure model and agent deployments</span>
+
+    <figure class="illustration" aria-label="Model catalog mockup">
+      <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" role="img">
+        <title>Foundry model catalog</title>
+        <rect width="800" height="300" rx="8" fill="var(--vsc-bg)"/>
+        <g font-family="var(--sans)" font-size="11" fill="var(--vsc-text)">
+          <rect x="20"  y="20" width="70" height="22" rx="11" fill="var(--vsc-accent)"/><text x="40"  y="35" fill="white">All</text>
+          <rect x="100" y="20" width="70" height="22" rx="11" fill="var(--vsc-chip)"/><text x="120" y="35">Chat</text>
+          <rect x="180" y="20" width="98" height="22" rx="11" fill="var(--vsc-chip)"/><text x="200" y="35">Embeddings</text>
+          <rect x="288" y="20" width="70" height="22" rx="11" fill="var(--vsc-chip)"/><text x="306" y="35">Image</text>
+          <rect x="368" y="20" width="82" height="22" rx="11" fill="var(--vsc-chip)"/><text x="384" y="35">Reasoning</text>
+          <rect x="460" y="20" width="72" height="22" rx="11" fill="var(--vsc-chip)"/><text x="478" y="35">Speech</text>
+        </g>
+        <g font-family="var(--sans)">
+          <g><rect x="20"  y="60"  width="240" height="100" rx="8" fill="var(--vsc-panel)" stroke="var(--vsc-border)"/><rect x="34" y="76"  width="30" height="30" rx="4" fill="var(--vsc-accent)"/><text x="76" y="86" font-size="13" font-weight="700" fill="var(--vsc-text)">gpt-4o-mini</text><text x="76" y="102" font-size="11" fill="var(--vsc-muted)">Azure OpenAI · 128K</text><text x="34" y="132" font-size="11" fill="var(--vsc-muted)">Chat · Multimodal</text><rect x="34" y="142" width="60" height="10" rx="2" fill="var(--success)"/><text x="100" y="152" font-size="10" fill="var(--vsc-muted)">Low cost · Fast</text></g>
+          <g><rect x="280" y="60"  width="240" height="100" rx="8" fill="var(--vsc-panel)" stroke="var(--vsc-border)"/><rect x="294" y="76" width="30" height="30" rx="4" fill="#8e44ad"/><text x="336" y="86" font-size="13" font-weight="700" fill="var(--vsc-text)">gpt-5-mini</text><text x="336" y="102" font-size="11" fill="var(--vsc-muted)">Azure OpenAI · 400K</text><text x="294" y="132" font-size="11" fill="var(--vsc-muted)">Chat · Reasoning · Tools</text><rect x="294" y="142" width="90" height="10" rx="2" fill="var(--vsc-accent)"/></g>
+          <g><rect x="540" y="60"  width="240" height="100" rx="8" fill="var(--vsc-panel)" stroke="var(--vsc-border)"/><rect x="554" y="76" width="30" height="30" rx="4" fill="#d35400"/><text x="596" y="86" font-size="13" font-weight="700" fill="var(--vsc-text)">Phi-4</text><text x="596" y="102" font-size="11" fill="var(--vsc-muted)">Microsoft · 16K · SLM</text><text x="554" y="132" font-size="11" fill="var(--vsc-muted)">On-device · Edge</text></g>
+          <g><rect x="20"  y="176" width="240" height="100" rx="8" fill="var(--vsc-panel)" stroke="var(--vsc-border)"/><rect x="34" y="192" width="30" height="30" rx="4" fill="#16a085"/><text x="76" y="202" font-size="13" font-weight="700" fill="var(--vsc-text)">text-embedding-3-small</text><text x="76" y="218" font-size="11" fill="var(--vsc-muted)">Azure OpenAI · 1536 dims</text><text x="34" y="248" font-size="11" fill="var(--vsc-muted)">Embeddings</text></g>
+          <g><rect x="280" y="176" width="240" height="100" rx="8" fill="var(--vsc-panel)" stroke="var(--vsc-border)"/><rect x="294" y="192" width="30" height="30" rx="4" fill="#c0392b"/><text x="336" y="202" font-size="13" font-weight="700" fill="var(--vsc-text)">gpt-image-1</text><text x="336" y="218" font-size="11" fill="var(--vsc-muted)">Azure OpenAI · Image gen</text><text x="294" y="248" font-size="11" fill="var(--vsc-muted)">Image · Inpainting</text></g>
+          <g><rect x="540" y="176" width="240" height="100" rx="8" fill="var(--vsc-panel)" stroke="var(--vsc-border)"/><rect x="554" y="192" width="30" height="30" rx="4" fill="#2c3e50"/><text x="596" y="202" font-size="13" font-weight="700" fill="var(--vsc-text)">whisper-large-v3</text><text x="596" y="218" font-size="11" fill="var(--vsc-muted)">OpenAI · STT</text><text x="554" y="248" font-size="11" fill="var(--vsc-muted)">Speech · Multilingual</text></g>
+        </g>
+      </svg>
+      <figcaption>Figure 2 — Model catalog with task filters.</figcaption>
+    </figure>
+
+    <h3>Decision table: which model for which task</h3>
+    <table class="ref">
+      <thead><tr><th>Task</th><th>Pick</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Agent planning, multi-step reasoning</td><td><code>gpt-4.1</code> / <code>gpt-5</code></td><td>Large context, strong tool-use</td></tr>
+        <tr><td>Cheap high-throughput chat</td><td><code>gpt-4o-mini</code> / <code>gpt-5-mini</code></td><td>Small language model, low cost per 1M tokens</td></tr>
+        <tr><td>Edge / offline inference</td><td><code>Phi-4</code></td><td>Runs on-device</td></tr>
+        <tr><td>Image + text understanding</td><td><code>gpt-4o</code></td><td>Native multimodal</td></tr>
+        <tr><td>Text-to-image</td><td><code>gpt-image-1</code></td><td>Generation + mask edits</td></tr>
+        <tr><td>Speech-to-text</td><td><code>whisper-large-v3</code> / Azure Speech</td><td>Multilingual, long audio</td></tr>
+        <tr><td>Embeddings for RAG</td><td><code>text-embedding-3-small</code> (1536) / <code>-3-large</code> (3072)</td><td>Cheap, good recall</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Deployment SKUs — know every one</h3>
+    <table class="ref">
+      <thead><tr><th>SKU</th><th>Unit</th><th>When to pick</th></tr></thead>
+      <tbody>
+        <tr><td><code>Standard</code></td><td>Pay-as-you-go TPM, regional</td><td>Dev, low traffic, single region</td></tr>
+        <tr><td><code>GlobalStandard</code></td><td>Pay-as-you-go, global capacity pool</td><td>Default for most prod workloads</td></tr>
+        <tr><td><code>DataZoneStandard</code></td><td>PAYG, data stays inside a geo (EU / US)</td><td>GDPR / data-residency requirements</td></tr>
+        <tr><td><code>ProvisionedManaged</code> (PTU)</td><td>Reserved throughput, predictable latency</td><td>SLA-sensitive production</td></tr>
+        <tr><td><code>Batch</code></td><td>50% discount, 24h SLA</td><td>Offline enrichment, eval sweeps</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout exam"><span class="icon">⬢</span><span><span class="exam-head">AI-103 fact</span>In your code the <code>model=</code> parameter always takes the <strong>deployment name</strong>, never the model id (<code>gpt-4o-mini</code>). The deployment name is the one you typed when deploying.</span></div>
+  </section>
+
+  <!-- ====================== STEP 4 ====================== -->
+  <section id="s4" class="step">
+    <h2><span class="chip">4</span>Scaffold a Foundry project</h2>
+    <span class="objective"><strong>Objective →</strong> Set up AI solutions in Foundry · Configure an application to connect to a Foundry project</span>
+
+    <p>Run <code>Foundry: Create Project</code>. The dialog below opens. The recommended AI-103 picks:</p>
+
+    <figure class="illustration" aria-label="Configure your project dialog mockup">
+      <svg viewBox="0 0 800 460" xmlns="http://www.w3.org/2000/svg" role="img">
+        <title>Configure your project dialog</title>
+        <rect width="800" height="460" rx="8" fill="var(--vsc-bg)"/>
+        <rect width="800" height="460" fill="black" opacity="0.4"/>
+        <rect x="140" y="30" width="520" height="400" rx="8" fill="#242424" stroke="var(--vsc-border)"/>
+        <text x="160" y="60" font-family="var(--sans)" font-size="16" font-weight="700" fill="white">Configure your project</text>
+        <text x="160" y="80" font-family="var(--sans)" font-size="12" fill="var(--vsc-muted)">Choose an SDK, language, and protocol to scaffold your project.</text>
+        <text x="620" y="60" font-family="var(--sans)" font-size="18" fill="var(--vsc-muted)">×</text>
+        <text x="160" y="110" font-family="var(--sans)" font-size="12" fill="var(--vsc-text)">SDK</text>
+        <g font-family="var(--sans)" font-size="12">
+          <rect x="160" y="118" width="90"  height="26" rx="13" fill="var(--vsc-chip)"/><text x="178" y="135" fill="white">Copilot SDK</text>
+          <rect x="258" y="118" width="124" height="26" rx="13" fill="white"/><text x="275" y="135" fill="black" font-weight="700">Agent Framework</text>
+          <rect x="390" y="118" width="110" height="26" rx="13" fill="var(--vsc-chip)"/><text x="403" y="135" fill="white">Bring Your Own</text>
+          <rect x="508" y="118" width="80"  height="26" rx="13" fill="var(--vsc-chip)"/><text x="525" y="135" fill="white">LangGraph</text>
+        </g>
+        <text x="160" y="170" font-family="var(--sans)" font-size="12" fill="var(--vsc-text)">Language</text>
+        <g font-family="var(--sans)" font-size="12">
+          <rect x="160" y="178" width="70" height="26" rx="13" fill="white"/><text x="184" y="195" fill="black" font-weight="700">Python</text>
+          <rect x="238" y="178" width="78" height="26" rx="13" fill="var(--vsc-chip)"/><text x="252" y="195" fill="white">C# (.NET)</text>
+        </g>
+        <text x="160" y="230" font-family="var(--sans)" font-size="12" fill="var(--vsc-text)">Protocol</text>
+        <g font-family="var(--sans)" font-size="12">
+          <rect x="160" y="238" width="86" height="26" rx="13" fill="white"/><text x="184" y="255" fill="black" font-weight="700">Responses</text>
+          <rect x="254" y="238" width="90" height="26" rx="13" fill="var(--vsc-chip)"/><text x="271" y="255" fill="white">Invocations</text>
+        </g>
+        <text x="160" y="290" font-family="var(--sans)" font-size="12" fill="var(--vsc-text)">Workspace Folder</text>
+        <rect x="160" y="298" width="400" height="28" fill="var(--vsc-bg)" stroke="var(--vsc-border)"/>
+        <text x="170" y="316" font-family="var(--mono)" font-size="11" fill="var(--vsc-text)">c:\Users\you\Private Directory\Microsoft Foundry</text>
+        <rect x="568" y="298" width="72" height="28" fill="var(--vsc-chip)"/><text x="590" y="316" font-family="var(--sans)" font-size="12" fill="white">Browse</text>
+        <text x="160" y="350" font-family="var(--sans)" font-size="12" fill="var(--vsc-text)">Model Deployment</text>
+        <rect x="160" y="358" width="480" height="28" fill="var(--vsc-bg)" stroke="var(--vsc-border)"/>
+        <text x="170" y="376" font-family="var(--sans)" font-size="12" fill="var(--vsc-text)">Deploy &amp; use new model (gpt-5.4-mini)</text>
+        <text x="624" y="376" font-family="var(--sans)" font-size="12" fill="var(--vsc-muted)">▾</text>
+        <rect x="470" y="400" width="80" height="26" fill="var(--vsc-chip)"/><text x="498" y="418" font-family="var(--sans)" font-size="12" fill="white">Cancel</text>
+        <rect x="560" y="400" width="80" height="26" fill="var(--vsc-accent)"/><text x="588" y="418" font-family="var(--sans)" font-size="12" fill="white">Create</text>
+      </svg>
+      <figcaption>Figure 3 — Picks for AI-103: Agent Framework · Python · Responses.</figcaption>
+    </figure>
+
+    <table class="ref">
+      <thead><tr><th>Field</th><th>Pick</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td>SDK</td><td><code>Agent Framework</code></td><td>Largest exam section (30-35%) is agents</td></tr>
+        <tr><td>Language</td><td><code>Python</code></td><td>Audience profile requires Python</td></tr>
+        <tr><td>Protocol</td><td><code>Responses</code></td><td>Unified Foundry protocol; Chat Completions is legacy</td></tr>
+        <tr><td>Folder</td><td><code>Microsoft Foundry</code></td><td>Avoid the "Foundary" typo</td></tr>
+        <tr><td>Model</td><td>A <code>-mini</code> chat model + <code>text-embedding-3-small</code></td><td>Cheap study tokens + embeddings for RAG</td></tr>
+      </tbody>
+    </table>
+
+    <p>The scaffold:</p>
+<pre>Microsoft Foundry/
+├── .env                      # project endpoint + deployment names
+├── requirements.txt          # azure-ai-projects, azure-ai-agents, openai, azure-identity
+├── main.py                   # sample Responses + Agent calls
+├── agents/
+│   └── default.agent.yaml
+├── evaluations/
+│   └── default.eval.yaml
+└── .foundry/
+    └── project.json          # project id, connections, deployments</pre>
+  </section>
+
+  <!-- ====================== STEP 5 ====================== -->
+  <section id="s5" class="step">
+    <h2><span class="chip">5</span>Responses API — the current protocol</h2>
+    <span class="objective"><strong>Objective →</strong> Build generative applications by using Foundry · Deploy and consume LLMs</span>
+
+    <p>Open <strong>Foundry → Playground</strong> to call the Responses API without writing code. Export → Python to copy the exact snippet.</p>
+
+<pre>from openai import AzureOpenAI
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+
+token_provider = get_bearer_token_provider(
+    DefaultAzureCredential(),
+    "https://cognitiveservices.azure.com/.default")
+
+client = AzureOpenAI(
+    azure_endpoint    = "https://&lt;aoai&gt;.openai.azure.com/",
+    api_version       = "2025-03-01-preview",
+    azure_ad_token_provider = token_provider)
+
+r = client.responses.create(
+    model        = "gpt-4o-mini",          # DEPLOYMENT name
+    instructions = "You are a terse Azure tutor.",
+    input        = "Explain embeddings in one sentence.")
+print(r.output_text)</pre>
+
+    <h3>Responses vs Chat Completions</h3>
+    <table class="ref">
+      <thead><tr><th>Capability</th><th>Responses</th><th>Chat Completions</th></tr></thead>
+      <tbody>
+        <tr><td>Status</td><td>Current default</td><td>Legacy, still supported</td></tr>
+        <tr><td>Stateful conversation</td><td>Built-in via <code>previous_response_id</code></td><td>You resend <code>messages[]</code></td></tr>
+        <tr><td>Tool calling</td><td>First-class <code>tools=[...]</code></td><td>First-class</td></tr>
+        <tr><td>Structured output</td><td><code>response_format = json_schema</code></td><td><code>response_format = json_schema</code></td></tr>
+        <tr><td>Streaming</td><td><code>client.responses.stream(...)</code> (typed events)</td><td><code>stream=True</code> (delta chunks)</td></tr>
+        <tr><td>Vision / audio inputs</td><td>Unified <code>input</code> array</td><td>Via <code>messages[].content</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout exam"><span class="icon">⬢</span><span><span class="exam-head">AI-103 fact</span><code>finish_reason="content_filter"</code> means your prompt or completion was blocked by the deployment's safety filter (Hate / Sexual / SelfHarm / Violence, severities 0/2/4/6). You tune these in the deployment's <strong>Content Filters</strong> tab.</span></div>
+  </section>
+
+  <!-- ====================== STEP 6 ====================== -->
+  <section id="s6" class="step">
+    <h2><span class="chip">6</span>Build an agent with the Agent Framework</h2>
+    <span class="objective"><strong>Objective →</strong> Build agents by using Foundry: roles, goals, conversation tracking, tool schemas (30-35% section)</span>
+
+    <p>Open <strong>Foundry → Agents → + New agent</strong>. The designer writes <code>agents/&lt;name&gt;.agent.yaml</code> which you check into git. The three core objects you must memorise:</p>
+
+    <table class="ref">
+      <thead><tr><th>Object</th><th>Purpose</th><th>Creation call</th></tr></thead>
+      <tbody>
+        <tr><td><code>Agent</code></td><td>Persona + model + tools + instructions. Reusable.</td><td><code>agents.create_agent(...)</code></td></tr>
+        <tr><td><code>Thread</code></td><td>Conversation memory. Lives independently of an agent.</td><td><code>agents.threads.create()</code></td></tr>
+        <tr><td><code>Run</code></td><td>One execution of an agent against a thread.</td><td><code>agents.runs.create_and_process(thread_id, agent_id)</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Run lifecycle (every state is a possible exam question)</h3>
+<pre>queued → in_progress ─┬─► completed      (final message on the thread)
+                      ├─► requires_action (tool call needs your output)
+                      ├─► failed         (error in agent.last_error)
+                      ├─► cancelled      (you called runs.cancel)
+                      └─► expired        (exceeded max_completion_tokens)</pre>
+
+    <figure class="illustration" aria-label="Agent designer mockup">
+      <svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg" role="img">
+        <title>Agent designer with tools and a run trace</title>
+        <rect width="800" height="320" rx="8" fill="var(--vsc-bg)"/>
+        <rect x="16" y="16" width="240" height="288" rx="6" fill="var(--vsc-panel)" stroke="var(--vsc-border)"/>
+        <text x="30" y="38" font-family="var(--sans)" font-size="12" font-weight="700" fill="var(--vsc-text)">Attached tools</text>
+        <g font-family="var(--sans)" font-size="12" fill="var(--vsc-text)">
+          <rect x="30" y="52" width="210" height="34" rx="4" fill="var(--vsc-bg)" stroke="var(--vsc-border)"/><text x="42" y="72">file_search</text><text x="42" y="84" font-size="10" fill="var(--vsc-muted)">Files: policies.pdf, faq.md</text>
+          <rect x="30" y="96" width="210" height="34" rx="4" fill="var(--vsc-bg)" stroke="var(--vsc-border)"/><text x="42" y="116">azure_ai_search</text><text x="42" y="128" font-size="10" fill="var(--vsc-muted)">docs-index · hybrid</text>
+          <rect x="30" y="140" width="210" height="34" rx="4" fill="var(--vsc-bg)" stroke="var(--vsc-border)"/><text x="42" y="160">function: get_ticket_status</text><text x="42" y="172" font-size="10" fill="var(--vsc-muted)">custom · requires_approval=false</text>
+          <rect x="30" y="184" width="210" height="34" rx="4" fill="var(--vsc-accent)" opacity="0.35"/><text x="42" y="204" fill="var(--vsc-text)">+ Add tool</text>
+        </g>
+        <rect x="272" y="16" width="512" height="288" rx="6" fill="var(--vsc-panel)" stroke="var(--vsc-border)"/>
+        <text x="286" y="38" font-family="var(--sans)" font-size="12" font-weight="700" fill="var(--vsc-text)">Run trace</text>
+        <g font-family="var(--sans)" font-size="12">
+          <circle cx="294" cy="64"  r="5" fill="var(--success)"/><text x="306" y="68"  fill="var(--vsc-text)">plan · "Look up ticket then summarise"</text>
+          <circle cx="294" cy="94"  r="5" fill="var(--success)"/><text x="306" y="98"  fill="var(--vsc-text)">tool_call · get_ticket_status({ticket_id: "T-901"})</text>
+          <circle cx="294" cy="124" r="5" fill="var(--success)"/><text x="306" y="128" fill="var(--vsc-text)">observation · {"status":"open","owner":"sam"}</text>
+          <circle cx="294" cy="154" r="5" fill="var(--success)"/><text x="306" y="158" fill="var(--vsc-text)">tool_call · azure_ai_search("outage runbook")</text>
+          <circle cx="294" cy="184" r="5" fill="var(--success)"/><text x="306" y="188" fill="var(--vsc-text)">observation · 3 passages retrieved</text>
+          <circle cx="294" cy="214" r="5" fill="var(--success)"/><text x="306" y="218" fill="var(--vsc-text)">answer · "Ticket T-901 is open with sam…"</text>
+          <text x="286" y="258" font-family="var(--sans)" font-size="11" fill="var(--vsc-muted)">status: completed · 1.2s · 320 tokens</text>
+          <rect x="286" y="268" width="100" height="26" rx="4" fill="var(--vsc-accent)"/><text x="310" y="286" fill="white">Save to YAML</text>
+        </g>
+      </svg>
+      <figcaption>Figure 4 — Agent designer: attached tools (left) and run trace (right).</figcaption>
+    </figure>
+
+    <h3>Multi-agent orchestration</h3>
+    <p>For the exam, know that a <strong>lead agent</strong> decomposes a task, delegates subtasks to <strong>specialist agents</strong>, then aggregates on a <strong>shared thread</strong>. Memory lives on the thread, not the agent — this is why specialists can see each other's work.</p>
+
+    <h3>Approval flow (semi-autonomous agents)</h3>
+    <p>Mark any dangerous tool with <code>requires_approval: true</code>. The run halts at <code>requires_action</code> until a human (or policy engine) posts an <code>approve</code> or <code>reject</code> back via <code>runs.submit_tool_outputs()</code>. Use this for <code>send_email</code>, <code>run_sql</code>, <code>execute_payment</code>.</p>
+  </section>
+
+  <!-- ====================== STEP 7 ====================== -->
+  <section id="s7" class="step">
+    <h2><span class="chip">7</span>Tools, RAG &amp; grounding</h2>
+    <span class="objective"><strong>Objective →</strong> Integrate agent tools including APIs, knowledge stores, search, content understanding, custom functions · Build retrieval and grounding pipelines</span>
+
+    <h3>Every tool type the exam names</h3>
+    <table class="ref">
+      <thead><tr><th>Tool type</th><th>Purpose</th><th>Config highlights</th></tr></thead>
+      <tbody>
+        <tr><td><code>function</code></td><td>Your Python function, invoked via JSON schema</td><td>Full type hints → auto schema</td></tr>
+        <tr><td><code>file_search</code></td><td>RAG over uploaded files (built-in vector store)</td><td>Upload once, reuse across agents</td></tr>
+        <tr><td><code>code_interpreter</code></td><td>Sandboxed Python for math / plots / CSV</td><td>Charges per container-second</td></tr>
+        <tr><td><code>azure_ai_search</code></td><td>Query an AI Search index</td><td><code>query_type</code>: simple · semantic · vector · vector_semantic_hybrid</td></tr>
+        <tr><td><code>content_understanding</code></td><td>CU analyzer as a tool (doc / image / video / audio)</td><td><code>analyzer_id</code> + <code>connection_name</code></td></tr>
+        <tr><td><code>openapi</code></td><td>Any REST API via its OpenAPI spec</td><td>Auth: anonymous · api_key · managed_identity · connection</td></tr>
+        <tr><td><code>bing_grounding</code></td><td>Grounded web search</td><td>Returns citations</td></tr>
+        <tr><td><code>browser_automation</code></td><td>Playwright-style navigation inside the agent</td><td>Preview — rarely tested as a required answer</td></tr>
+      </tbody>
+    </table>
+
+    <h3>RAG — two patterns the exam contrasts</h3>
+    <p><strong>Server-side (On Your Data)</strong> — Foundry does retrieval:</p>
+<pre>client.chat.completions.create(
+    model = deployment,
+    messages = [...],
+    extra_body = {"data_sources": [{
+        "type": "azure_search",
+        "parameters": {
+            "endpoint": "https://&lt;search&gt;.search.windows.net",
+            "index_name": "docs-index",
+            "authentication": {"type": "system_assigned_managed_identity"},
+            "embedding_dependency": {
+                "type": "deployment_name",
+                "deployment_name": "text-embedding-3-small"},
+            "query_type": "vector_semantic_hybrid"}}]})</pre>
+
+    <p><strong>Client-side</strong> — you orchestrate:</p>
+<pre># 1. embed query   2. search index   3. stuff context   4. responses.create</pre>
+
+    <h3>AI Search index essentials (exam-ready)</h3>
+    <table class="ref">
+      <thead><tr><th>Field attribute</th><th>What it enables</th></tr></thead>
+      <tbody>
+        <tr><td><code>searchable</code></td><td>Full-text matches on this field</td></tr>
+        <tr><td><code>filterable</code></td><td><code>$filter=category eq 'ai'</code></td></tr>
+        <tr><td><code>sortable</code></td><td><code>$orderby=price desc</code></td></tr>
+        <tr><td><code>facetable</code></td><td>Aggregate counts for faceted navigation</td></tr>
+        <tr><td><code>retrievable</code></td><td>Returned in search results (false = filter-only)</td></tr>
+        <tr><td><code>key</code></td><td>Unique id (exactly one field per index)</td></tr>
+      </tbody>
+    </table>
+    <p>Vector field type: <code>Collection(Edm.Single)</code> with <code>dimensions</code> and <code>vectorSearchProfile</code>. Hybrid search = BM25 + vector scores fused via <strong>RRF</strong> (Reciprocal Rank Fusion). Semantic ranker needs a <code>semanticConfiguration</code> and returns <code>@search.reranker_score</code>, <code>captions</code>, <code>answers</code>.</p>
+  </section>
+
+  <!-- ====================== STEP 8 ====================== -->
+  <section id="s8" class="step">
+    <h2><span class="chip">8</span>Vision &amp; Content Understanding</h2>
+    <span class="objective"><strong>Objective →</strong> Implement computer vision solutions · Implement information extraction solutions</span>
+
+    <h3>Image generation (<code>gpt-image-1</code>)</h3>
+<pre># Generate
+client.images.generate(model="gpt-image-1", prompt="...", size="1024x1024")
+
+# Inpaint (mask-based edit) — transparent pixels on mask = region to re-paint
+with open("photo.png","rb") as img, open("mask.png","rb") as mask:
+    client.images.edit(model="gpt-image-1", image=img, mask=mask,
+                       prompt="Replace the sky with a sunset")</pre>
+
+    <h3>Multimodal understanding — ground an answer in an image</h3>
+<pre>client.responses.create(model="gpt-4o", input=[{
+    "role": "user",
+    "content": [
+        {"type": "input_text",  "text": "Produce alt-text under 125 chars."},
+        {"type": "input_image", "image_url": "https://..."}]}])</pre>
+
+    <h3>Content Understanding — unified extractor for doc / image / video / audio</h3>
+    <p>CU replaces Document Intelligence on the AI-103 skills list. One tool, four analyzer <em>kinds</em>:</p>
+    <table class="ref">
+      <thead><tr><th>Analyzer kind</th><th>Input</th><th>Outputs</th></tr></thead>
+      <tbody>
+        <tr><td><code>document</code></td><td>PDF / image</td><td>OCR text, layout, fields, tables, markdown</td></tr>
+        <tr><td><code>image</code></td><td>JPG / PNG</td><td>Captions, tags, embedded text, objects</td></tr>
+        <tr><td><code>video</code></td><td>MP4</td><td>Scene segments, transcript, visual summary</td></tr>
+        <tr><td><code>audio</code></td><td>WAV / MP3</td><td>Transcript, diarization, sentiment</td></tr>
+      </tbody>
+    </table>
+    <p>Modes: <code>standard</code> (single-task, fast) · <code>pro</code> (multi-step reasoning, slower, higher quality). Prebuilts to recognise: <code>prebuilt-documentAnalyzer</code>, <code>invoice-markdown</code>, <code>receipt</code>, <code>businessCard</code>, <code>idDocument</code>.</p>
+
+    <div class="callout exam"><span class="icon">⬢</span><span><span class="exam-head">AI-103 fact</span>Indirect prompt-injection attacks hide instructions inside document OCR or image text. Always run untrusted content through <strong>Prompt Shield</strong> (Content Safety) before passing it to an LLM.</span></div>
+  </section>
+
+  <!-- ====================== STEP 9 ====================== -->
+  <section id="s9" class="step">
+    <h2><span class="chip">9</span>Text analysis &amp; Speech</h2>
+    <span class="objective"><strong>Objective →</strong> Implement text analysis solutions · Implement speech solutions</span>
+
+    <h3>Structured text extraction with the Responses API</h3>
+    <p>AI-103 prefers LLM-prompted extraction over the classic Language service. Force a schema:</p>
+<pre>SCHEMA = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "ticket",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "sentiment":  {"type":"string","enum":["positive","neutral","negative"]},
+                "intent":     {"type":"string"},
+                "entities":   {"type":"array","items":{"type":"string"}},
+                "summary":    {"type":"string"}},
+            "required": ["sentiment","intent","summary"]}}}
+
+client.responses.create(model=dep, input=text, response_format=SCHEMA)</pre>
+
+    <h3>Translator — as a Foundry Tool or raw REST</h3>
+<pre>POST https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&amp;to=af&amp;to=zu
+Headers: Ocp-Apim-Subscription-Key, Ocp-Apim-Subscription-Region
+Body:    [{"text": "Hello"}]</pre>
+    <div class="callout warn"><span class="icon">!</span><span><code>Ocp-Apim-Subscription-Region</code> is <strong>mandatory</strong> alongside the key. Omitting it returns 401. Classic exam trap.</span></div>
+
+    <h3>Speech — STT, TTS, custom speech</h3>
+<pre>import azure.cognitiveservices.speech as speechsdk
+cfg = speechsdk.SpeechConfig(subscription=key, region=region)
+cfg.speech_recognition_language = "en-US"
+
+# STT
+reco = speechsdk.SpeechRecognizer(speech_config=cfg,
+            audio_config=speechsdk.audio.AudioConfig(filename="in.wav"))
+reco.recognize_once_async().get()
+
+# TTS (neural voice)
+cfg.speech_synthesis_voice_name = "en-US-AvaNeural"
+synth = speechsdk.SpeechSynthesizer(speech_config=cfg)
+synth.speak_text_async("Hello from Foundry").get()
+
+# Custom Speech — point at your deployment
+cfg.endpoint_id = "&lt;deployment-guid&gt;"</pre>
+
+    <p>For voice agents, prefer the <strong>Realtime API</strong> (<code>gpt-4o-realtime</code>) over the STT → chat → TTS hop — one WebSocket, no intermediate text latency.</p>
+  </section>
+
+  <!-- ====================== STEP 10 ====================== -->
+  <section id="s10" class="step">
+    <h2><span class="chip">10</span>Evaluation, safety &amp; monitoring</h2>
+    <span class="objective"><strong>Objective →</strong> Implement responsible AI · Monitor model performance, drift, safety events, grounding quality</span>
+
+    <h3>Evaluators (<code>azure-ai-evaluation</code>)</h3>
+    <table class="ref">
+      <thead><tr><th>Evaluator</th><th>Detects</th></tr></thead>
+      <tbody>
+        <tr><td><code>GroundednessEvaluator</code></td><td>Answers unsupported by provided context (fabrication)</td></tr>
+        <tr><td><code>RelevanceEvaluator</code></td><td>Does the answer address the question?</td></tr>
+        <tr><td><code>FluencyEvaluator</code></td><td>Grammar / natural language quality</td></tr>
+        <tr><td><code>CoherenceEvaluator</code></td><td>Internal logical consistency</td></tr>
+        <tr><td><code>SimilarityEvaluator</code></td><td>Match against a reference answer</td></tr>
+        <tr><td><code>ContentSafetyEvaluator</code></td><td>Hate / Sexual / SelfHarm / Violence severities</td></tr>
+        <tr><td><code>IndirectAttackEvaluator</code></td><td>Prompt injection via documents</td></tr>
+        <tr><td><code>ProtectedMaterialEvaluator</code></td><td>Copyrighted content leakage</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Content Safety categories</h3>
+    <p>Each of <strong>Hate / Sexual / SelfHarm / Violence</strong> gets a severity <code>0 (safe) · 2 (low) · 4 (medium) · 6 (high)</code> — the default <code>FourSeverityLevels</code> scale. Also available: <code>EightSeverityLevels</code> (0/1/2/3/4/5/6/7).</p>
+
+    <h3>Prompt Shield — the two attack types</h3>
+    <ul>
+      <li><strong>User prompt attacks</strong> — jailbreaks like "Ignore all previous instructions."</li>
+      <li><strong>Document attacks</strong> — instructions smuggled in ingested documents (indirect prompt injection).</li>
+    </ul>
+
+    <h3>Monitoring — metrics the exam names</h3>
+    <table class="ref">
+      <thead><tr><th>Metric</th><th>Service</th><th>Why it matters</th></tr></thead>
+      <tbody>
+        <tr><td><code>ProcessedPromptTokens</code></td><td>Azure OpenAI</td><td>Cost + TPM budget</td></tr>
+        <tr><td><code>GeneratedCompletionTokens</code></td><td>Azure OpenAI</td><td>Cost</td></tr>
+        <tr><td><code>ActiveTokens</code> (PTU)</td><td>Azure OpenAI</td><td>Reserved capacity used</td></tr>
+        <tr><td><code>TokenTransaction</code></td><td>Azure OpenAI</td><td>Request count</td></tr>
+        <tr><td><code>ContentFilterBlocked</code></td><td>Azure OpenAI</td><td>Safety-driven refusals</td></tr>
+        <tr><td><code>Latency</code>, <code>TimeToFirstByte</code></td><td>All</td><td>UX SLA</td></tr>
+        <tr><td><code>SearchQueryLatency</code>, <code>IndexSize</code></td><td>AI Search</td><td>RAG performance</td></tr>
+      </tbody>
+    </table>
+
+    <figure class="illustration" aria-label="Monitoring dashboard mockup">
+      <svg viewBox="0 0 800 260" xmlns="http://www.w3.org/2000/svg" role="img">
+        <title>Monitoring pane</title>
+        <rect width="800" height="260" rx="8" fill="var(--vsc-bg)"/>
+        <g font-family="var(--sans)">
+          <rect x="20"  y="20" width="180" height="80" rx="6" fill="var(--vsc-panel)" stroke="var(--vsc-border)"/><text x="34"  y="42" font-size="11" fill="var(--vsc-muted)">Requests (24h)</text><text x="34" y="72" font-size="24" font-weight="700" fill="var(--vsc-text)">12,840</text><text x="34" y="92" font-size="11" fill="var(--success)">▲ 4.2% vs yesterday</text>
+          <rect x="208" y="20" width="180" height="80" rx="6" fill="var(--vsc-panel)" stroke="var(--vsc-border)"/><text x="222" y="42" font-size="11" fill="var(--vsc-muted)">P50 latency</text><text x="222" y="72" font-size="24" font-weight="700" fill="var(--vsc-text)">480 ms</text><text x="222" y="92" font-size="11" fill="var(--success)">▼ 20 ms</text>
+          <rect x="396" y="20" width="180" height="80" rx="6" fill="var(--vsc-panel)" stroke="var(--vsc-border)"/><text x="410" y="42" font-size="11" fill="var(--vsc-muted)">TPM used</text><text x="410" y="72" font-size="24" font-weight="700" fill="var(--vsc-text)">62k / 150k</text><text x="410" y="92" font-size="11" fill="var(--vsc-muted)">41% of quota</text>
+          <rect x="584" y="20" width="180" height="80" rx="6" fill="var(--vsc-panel)" stroke="var(--vsc-border)"/><text x="598" y="42" font-size="11" fill="var(--vsc-muted)">Content filter blocks</text><text x="598" y="72" font-size="24" font-weight="700" fill="var(--warn)">3</text><text x="598" y="92" font-size="11" fill="var(--vsc-muted)">last 24h</text>
+        </g>
+        <rect x="20" y="116" width="760" height="128" rx="6" fill="var(--vsc-panel)" stroke="var(--vsc-border)"/>
+        <text x="34" y="138" font-family="var(--sans)" font-size="12" font-weight="700" fill="var(--vsc-text)">Recent requests</text>
+        <g font-family="var(--mono)" font-size="11" fill="var(--vsc-text)">
+          <text x="34" y="162">09:41:12  POST /responses   200  432 ms  prompt=240 completion=140</text>
+          <text x="34" y="180">09:41:08  POST /threads     200   28 ms</text>
+          <text x="34" y="198">09:41:06  POST /runs        200  980 ms  tool_calls=2</text>
+          <text x="34" y="216">09:41:01  POST /responses   429   12 ms  <tspan fill="var(--warn)">ratelimited — retry after 3s</tspan></text>
+        </g>
+      </svg>
+      <figcaption>Figure 5 — Monitoring tiles + live request tail.</figcaption>
+    </figure>
+
+    <p>Everything surfaces in <strong>Azure Monitor → Log Analytics</strong> through Diagnostic Settings. Enable the <code>RequestResponse</code> and <code>Trace</code> categories to capture prompt + completion text (watch the privacy implications of doing so).</p>
+  </section>
+
+  <!-- ====================== STEP 11 ====================== -->
+  <section id="cheat" class="step">
+    <h2><span class="chip">11</span>Exam cheat sheet</h2>
+
+    <h3>Auth patterns</h3>
+    <table class="ref">
+      <thead><tr><th>Pattern</th><th>Code</th><th>Role needed</th></tr></thead>
+      <tbody>
+        <tr><td>Key</td><td><code>AzureKeyCredential(key)</code></td><td>n/a</td></tr>
+        <tr><td>Managed identity</td><td><code>DefaultAzureCredential()</code></td><td>Service-specific (see below)</td></tr>
+        <tr><td>Service principal</td><td><code>ClientSecretCredential(tenant, client_id, secret)</code></td><td>Same as MI</td></tr>
+      </tbody>
+    </table>
+
+    <h3>RBAC roles</h3>
+    <table class="ref">
+      <thead><tr><th>Role</th><th>Grants</th></tr></thead>
+      <tbody>
+        <tr><td><code>Cognitive Services OpenAI User</code></td><td>Call AOAI deployments (inference)</td></tr>
+        <tr><td><code>Cognitive Services OpenAI Contributor</code></td><td>Create/modify deployments</td></tr>
+        <tr><td><code>Azure AI Developer</code></td><td>Work with Foundry projects</td></tr>
+        <tr><td><code>Azure AI Project Manager</code></td><td>Manage project members &amp; connections</td></tr>
+        <tr><td><code>Search Index Data Reader</code></td><td>Query an AI Search index</td></tr>
+        <tr><td><code>Search Index Data Contributor</code></td><td>Push docs, modify index content</td></tr>
+        <tr><td><code>Search Service Contributor</code></td><td>Create/modify indexes &amp; indexers</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Common gotchas</h3>
+    <ul>
+      <li><code>model=</code> is always the <strong>deployment name</strong>, never the model id.</li>
+      <li>Translator requires <strong>both</strong> <code>Ocp-Apim-Subscription-Key</code> and <code>Ocp-Apim-Subscription-Region</code>.</li>
+      <li>Hybrid search merges BM25 + vector via <strong>RRF</strong>.</li>
+      <li>Vector field type = <code>Collection(Edm.Single)</code>.</li>
+      <li>Content Safety default severities = <code>0, 2, 4, 6</code>.</li>
+      <li><code>finish_reason="content_filter"</code> → safety block, not an error.</li>
+      <li>Agent memory lives on the <strong>thread</strong>, not the agent.</li>
+      <li>Run state <code>requires_action</code> → you must call <code>submit_tool_outputs</code>.</li>
+      <li>Responses API is the current path; Chat Completions is legacy but still tested.</li>
+      <li>429 responses → check TPM quota per region; mitigate with PTU, multi-region, or Batch SKU.</li>
+    </ul>
+  </section>
+
+  <!-- ====================== STEP 12 ====================== -->
+  <section id="trouble" class="step">
+    <h2><span class="chip">12</span>Troubleshooting the toolkit itself</h2>
+
+    <details><summary>"You are not signed in to an Azure account" loops in the logs</summary>
+    <div class="body">
+      <ol>
+        <li>Prefer Device Code: <code>Azure: Sign In with Device Code</code>.</li>
+        <li>After auth, run <code>Azure: Select Tenant</code> then <code>Azure: Select Subscriptions</code>.</li>
+        <li>If still unsigned: close VS Code, delete <code>%USERPROFILE%\.Azure\</code> and <code>%APPDATA%\Code\User\globalStorage\ms-vscode.azure-account\</code>, reopen.</li>
+        <li>Confirm you installed <strong>Azure Resources</strong> (not the deprecated <strong>Azure Account</strong>).</li>
+      </ol>
+    </div>
+    </details>
+
+    <details><summary>401 <code>invalid_api_key</code> pointing at <code>platform.openai.com</code></summary>
+    <div class="body">
+      <p>Your model is registered under the <strong>OpenAI</strong> provider instead of <strong>Azure OpenAI</strong>. Azure keys don't start with <code>sk-</code> and public OpenAI rejects them.</p>
+      <ol>
+        <li>Rotate the leaked key: Portal → the Azure OpenAI resource → <strong>Keys and Endpoint</strong> → <strong>Regenerate Key1 + Key2</strong>.</li>
+        <li>In Foundry tree view, right-click the <code>OpenAI/…</code> model → <strong>Remove</strong>.</li>
+        <li><strong>+ Add Model → Azure OpenAI</strong>, pick subscription → resource → deployment. Don't paste a key.</li>
+      </ol>
+    </div>
+    </details>
+
+    <details><summary>Deployment picker is empty</summary>
+    <div class="body">
+      <ol>
+        <li>Open the Azure OpenAI resource in Azure AI Foundry portal → <strong>Model deployments</strong> → <strong>+ Deploy model</strong>.</li>
+        <li>Pick the model, name it, choose SKU (<code>GlobalStandard</code> is safest), set TPM capacity → <strong>Deploy</strong>.</li>
+        <li>Return to VS Code and re-run <strong>Add Model</strong>.</li>
+      </ol>
+    </div>
+    </details>
+
+    <details><summary>Response 429 (ratelimited)</summary>
+    <div class="body">
+      <ol>
+        <li>Check TPM used vs quota in the Monitoring pane.</li>
+        <li>Raise TPM for the deployment (per region; check regional caps in the portal).</li>
+        <li>Add a second deployment in a different region and load-balance client-side.</li>
+        <li>For predictable latency, switch to <code>ProvisionedManaged</code> (PTU).</li>
+        <li>Respect <code>Retry-After</code> / <code>x-ms-retry-after-ms</code> headers in your client.</li>
+      </ol>
+    </div>
+    </details>
+
+    <details><summary>Private endpoint blocks the extension</summary>
+    <div class="body">
+      <p>If the AOAI resource has public network access disabled, VS Code on a laptop outside the VNet can't reach it. Either:</p>
+      <ul>
+        <li>Connect over the corporate VPN / Azure Bastion and keep public access off, or</li>
+        <li>Temporarily enable <strong>Selected networks</strong> with your public IP, run the extension, then re-lock.</li>
+      </ul>
+    </div>
+    </details>
+  </section>
+
+  <footer>
+    Built for <a href="./STUDY_PLAN.md">AI-103 — 5-Day Practical Kit</a>.
+    Diagrams are illustrative SVGs, not official Microsoft screenshots.
+    When in doubt, the <a href="https://learn.microsoft.com/credentials/certifications/resources/study-guides/ai-103">official AI-103 study guide</a> is the source of truth.
+  </footer>
+</div>
+
+<script>
+  const btn = document.getElementById('themeToggle');
+  const root = document.documentElement;
+  let pref = null;
+  try { pref = localStorage.getItem('theme'); } catch(e) {}
+  if (pref === 'light' || pref === 'dark') root.setAttribute('data-theme', pref);
+  btn.addEventListener('click', () => {
+    const current = root.getAttribute('data-theme')
+      || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch(e) {}
+  });
+</script>
+
+</body>
+</html>
